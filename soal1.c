@@ -14,18 +14,8 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 {
   int res;
   char fpath[1000];
-  char newFile[100];
-  printf("path   : %s, len: %ld\n", path, strlen(path));
-  if (strcmp(path, "/") != 0) {
-    memcpy(newFile, path, strlen(path) - 4);
-    newFile[strlen(path) - 4] = '\0';
-  } else {
-    memcpy(newFile, path, strlen(path));
-  }
-  printf("newFile: %s\n", newFile);
-  sprintf(fpath,"%s%s",dirpath, newFile);
+  sprintf(fpath,"%s%s",dirpath,path);
   res = lstat(fpath, stbuf);
-
   if (res == -1)
     return -errno;
 
@@ -36,12 +26,6 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
            off_t offset, struct fuse_file_info *fi)
 {
  char fpath[1000];
-  if(strcmp(path,"/") == 0)
-  {
-    path=dirpath;
-    sprintf(fpath,"%s",path);
-  }
-  else sprintf(fpath, "%s%s",dirpath,path);
   int res = 0;
 
   DIR *dp;
@@ -73,18 +57,12 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
         struct fuse_file_info *fi)
 {
   char fpath[1000];
-  char newFile[100];
-  if(strcmp(path,"/") == 0)
-  {
-    memcpy(newFile, path, strlen(path));
-    sprintf(fpath,"%s",newFile);
-  }
-  else {
-    memcpy(newFile, path, strlen(path) - 4);
-    newFile[strlen(path) - 4] = '\0';
-
-    sprintf(fpath, "%s%s",dirpath,newFile);
-  }
+	if(strcmp(path,"/") == 0)
+	{
+		path=dirpath;
+		sprintf(fpath,"%s",path);
+	}
+	else sprintf(fpath, "%s%s",dirpath,path);
   int res = 0;
   int fd = 0 ;
 
