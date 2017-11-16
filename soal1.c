@@ -53,7 +53,41 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
   return 0;
 }
 
+static int xmp_open(const char *path, struct fuse_file_info *fi)
+{
+	int res, len, num=0, flag=0;
+	char fpath[1000];
+	struct stat st;
+	st.st_atime = time(NULL) = lastaccess;
+	sprintf(fpath, "%s%s", dirpath,path);
+	//strcpy(lastaccess,fpath);
+	strcy(st.st_atime, fpath);
+	
+	len = strlen(lastaccess);
+	if((len >= 2) && strcmp(&(lastaccess[len - 4]), ".pdf") == 0){
+		char command[100];
+		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
+		system(command);
+	}
+	else if((len >= 2) && strcmp(&(lastaccess[len - 4]), ".doc") == 0){
+		char command[100];
+		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
+		system(command);
+	}
+	else if((len >= 2) && strcmp(&(lastaccess[len - 4]), ".txt") == 0){
+		char command[100];
+		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
+		system(command);
+	}
 
+	res = open(fpath, fi->flags); //langsung dibuka file
+	if(res == -1)
+		return -errno;
+
+
+	close(res);
+	return 0;
+}
 
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
         struct fuse_file_info *fi)
