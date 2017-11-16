@@ -76,20 +76,25 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 	//int len; 
 	char fpath[1000];
 	sprintf(fpath, "%s%s", dirpath,path);
-	
-	/*strcpy(access, fpath);	
-	len = strlen(path);
-	if((len >= 2) && strcmp(&(access[len - 4]), ".pdf") == 0){
+	struct dirent *de;
+	if(strcmp(de->d_name,".pdf") == 0){
 		char command[100];
 		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		system(command);
 	}
-	else if((len >= 2) && strcmp(&(access[len - 4]), ".doc") == 0){
+	/*strcpy(lastaccess, fpath);	
+	len = strlen(lastaccess);
+	if((len >= 2) && strcmp(&(lastaccess[len - 4]), ".pdf") == 0){
 		char command[100];
 		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		system(command);
 	}
-	else if((len >= 2) && strcmp(&(access[len - 4]), ".txt") == 0){
+	else if((len >= 2) && strcmp(&(lastaccess[len - 4]), ".doc") == 0){
+		char command[100];
+		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
+		system(command);
+	}
+	else if((len >= 2) && strcmp(&(lastaccess[len - 4]), ".txt") == 0){
 		char command[100];
 		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		system(command);
