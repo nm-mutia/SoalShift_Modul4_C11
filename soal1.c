@@ -77,17 +77,17 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 	char fpath[1000];
 	sprintf(fpath, "%s%s", dirpath,path);
 	struct dirent *de;
-	if(strcmp(de->d_name,".pdf") == 0){
+	if(strcmp(de->d_name,"*.pdf") == 0){
 		char command[100];
 		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		system(command);
 	}
-	if(strcmp(de->d_name,".doc") == 0){
+	if(strcmp(de->d_name,"*.doc") == 0){
 		char command[100];
 		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		system(command);
 	}
-	if(strcmp((de->d_name)-4,".txt") == 0){
+	if(strcmp((de->d_name)-4,"*.txt") == 0){
 		char command[100];
 		sprintf(command,"zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		system(command);
