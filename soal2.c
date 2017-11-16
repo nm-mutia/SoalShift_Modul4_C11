@@ -84,8 +84,12 @@ static int xmp_mkdir(const char *path, mode_t mode)
 static int xmp_chmod(const char *path, mode_t mode)
 {
 	int res;
-
+	char fpath[1000];
+	sprintf(fpath, "%s%s", dirpath, path);
 	res = chmod(path, mode);
+	char command[100];
+	sprintf(command,"chmod 000 '%s.ditandai'", fpath);
+	system(command);
 	if (res == -1)
 		return -errno;
 
