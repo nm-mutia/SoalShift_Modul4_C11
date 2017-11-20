@@ -26,10 +26,9 @@
 #endif
 
 static const char *dirpath = "/home/dayday/Downloads";
-//static const char *dirpath2 = "/home/dayday/Downloads/simpanan";
 
-char alamat[100],alamat2[100];
-int buka=0;
+// char alamat[100],alamat2[100];
+// int buka=0;
 
 
 //Mendapatkan file attribut
@@ -130,11 +129,11 @@ static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 //         return -errno;
 //     return 0;
 // }
-// const char *ext(const char *filename) {
-//     const char *dot = strrchr(filename, '.');
-//     if(!dot || dot == filename) return "";
-//     return dot + 1;
-// }
+const char *ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
+}
 //Membaca data dari file yang telah dibuka
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struct fuse_file_info *fi)
 {
@@ -144,13 +143,13 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struc
     
     if(strcmp(path,"/") == 0){
     	path=dirpath;
-    	sprintf(fpath,"%s",path);
+    	sprintf(fpath,"%s/simpanan",path);
     	}
     else sprintf(fpath, "%s/simpanan/%s",dirpath,path);
     int res = 0;
     
     char read[1000], dirmake[1000];
-    sprintf(read, "%s.ditandai", fpath);
+    sprintf(read, "%s.copy", fpath);
     rename(fpath, read);
     
     if(strcmp(ext(read),"copy")==0){
@@ -170,67 +169,67 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struc
 }
 
 //Menulis data di data yg dibuka
-static int xmp_write(const char *path, const char *buf, size_t size,off_t offset, struct fuse_file_info *fi)
-{
-    int fd;
-    int res;
-    char fpath[1000];
-    sprintf(fpath,"%s%s",dirpath,path);
-    (void) fi;
-    fd = open(fpath, O_WRONLY);
-    //if (buka==1)
-    //{
-       /* char temp1[100],fpath2[1000];
-        sprintf(fpath2,"%s%s",dirpath,alamat);  
-        FILE *fd1, *fd2;
+// static int xmp_write(const char *path, const char *buf, size_t size,off_t offset, struct fuse_file_info *fi)
+// {
+//     int fd;
+//     int res;
+//     char fpath[1000];
+//     sprintf(fpath,"%s%s",dirpath,path);
+//     (void) fi;
+//     fd = open(fpath, O_WRONLY);
+//     //if (buka==1)
+//     //{
+//        /* char temp1[100],fpath2[1000];
+//         sprintf(fpath2,"%s%s",dirpath,alamat);  
+//         FILE *fd1, *fd2;
       
-        strcpy(temp1,fpath2);
-        strcat(temp1,".copy");
+//         strcpy(temp1,fpath2);
+//         strcat(temp1,".copy");
   
-        char kata[100];
+//         char kata[100];
       
-        fd1 = fopen(temp1, "w+");
-        fd2 = fopen(fpath2, "a+");
-        while(fgets(kata,100,fd2)!=NULL)
-        {
-            fprintf(fd1,"%s",kata);  
-        }
-        fclose(fd1);
-        fclose(fd2);
-    //}*/
-    if (fd == -1)
-        return -errno;
-    res = pwrite(fd, buf, size, offset);
-    if (res == -1)
-        res = -errno;
-    close(fd);  
-    return res;
-}
+//         fd1 = fopen(temp1, "w+");
+//         fd2 = fopen(fpath2, "a+");
+//         while(fgets(kata,100,fd2)!=NULL)
+//         {
+//             fprintf(fd1,"%s",kata);  
+//         }
+//         fclose(fd1);
+//         fclose(fd2);
+//     //}*/
+//     if (fd == -1)
+//         return -errno;
+//     res = pwrite(fd, buf, size, offset);
+//     if (res == -1)
+//         res = -errno;
+//     close(fd);  
+//     return res;
+// }
 
-//Membuat directory
-static int xmp_mkdir(const char *path, mode_t mode)
-{
-    buka=0;
-    int res;
-    char fpath[1000];
-    sprintf(fpath,"%s%s",dirpath,path);
-    res = mkdir(fpath, mode);
-    if (res == -1)
-        return -errno;
-    return 0;
-}
+// //Membuat directory
+// static int xmp_mkdir(const char *path, mode_t mode)
+// {
+//     buka=0;
+//     int res;
+//     char fpath[1000];
+//     sprintf(fpath,"%s%s",dirpath,path);
+//     res = mkdir(fpath, mode);
+//     if (res == -1)
+//         return -errno;
+//     return 0;
+// }
 
-//mengganti alokasi memori tiap file
-    static int xmp_truncate(const char *path, off_t size){
-    int res;
-    char fpath[1000];
-    sprintf(fpath,"%s%s", dirpath, path);
-    res = truncate(fpath, size);
-    if(res == -1)
-    	return -errno;
+// //mengganti alokasi memori tiap file
+//     static int xmp_truncate(const char *path, off_t size){
+//     int res;
+//     char fpath[1000];
+//     sprintf(fpath,"%s%s", dirpath, path);
+//     res = truncate(fpath, size);
+//     if(res == -1)
+//     	return -errno;
 
-    return 0;
-}
+//     return 0;
+// }
 
 static struct fuse_operations xmp_oper = {
     .getattr = xmp_getattr,
@@ -239,22 +238,22 @@ static struct fuse_operations xmp_oper = {
     .readdir = xmp_readdir,
     //.opendir = xmp_opendir,
     //.releasedir = xmp_releasedir,
-    .mknod = xmp_mknod,
-    .mkdir = xmp_mkdir,
+//     .mknod = xmp_mknod,
+//     .mkdir = xmp_mkdir,
     //.symlink = xmp_symlink,
     //.unlink = xmp_unlink,
     //.rmdir = xmp_rmdir,
-    .rename = xmp_rename,
+    //.rename = xmp_rename,
     //.link = xmp_link,
-    .chmod = xmp_chmod,
+    //.chmod = xmp_chmod,
     //.chown = xmp_chown,
-    .truncate = xmp_truncate,
+    //.truncate = xmp_truncate,
     //#ifdef HAVE_UTIMENSAT
     //.utimens = xmp_utimens,
     //#endif
     //.open = xmp_open,
     .read = xmp_read,
-    .write = xmp_write,
+    //.write = xmp_write,
     //.utime=xmp_utime,
     //.release = xmp_release,
     //#ifdef HAVE_POSIX_FALLOCATE
