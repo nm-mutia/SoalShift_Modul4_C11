@@ -1,6 +1,7 @@
 #define FUSE_USE_VERSION 28
 #include <fuse.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -79,9 +80,10 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
   	int fd = 0 ;
 	
 	if(strcmp(ext(path),"pdf")==0 || strcmp(ext(path),"doc")==0 || strcmp(ext(path),"txt")==0){
-		char read[1000];
+		char read[1000], temp[1000];
 		sprintf(read, "%s.ditandai", fpath);
-		system("chmod 000 /home/mutia/Documents/*.ditandai");
+		sprintf(temp, "chmod 077 %s",read);
+		system(temp);
 		system("zenity --error --text='Terjadi kesalahan! File berisi konten berbahaya.'");
 		rename(fpath, read);
 		return -errno;
