@@ -25,7 +25,7 @@
 #include <string.h>
 #endif
 
-static const char *dirpath = "/home/dayday/Downloads";
+static const char *dirpath = "/home/dayday/Downloads/simpanan";
 //static const char *dirpath2 = "/home/dayday/Downloads/simpanan";
 
 char alamat[100],alamat2[100];
@@ -128,7 +128,11 @@ static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
         return -errno;
     return 0;
 }
-
+const char *ext(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
+}
 //Membaca data dari file yang telah dibuka
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struct fuse_file_info *fi)
 {
@@ -142,7 +146,14 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struc
     	}
     else sprintf(fpath, "%s%s",dirpath,path);
     int res = 0;
-
+    
+    char read[1000], dirmake[1000];
+	sprintf(read, "%s.ditandai", fpath);
+    rename(fpath, read);
+    
+    if(strcmp(ext(path),"copy")==0){
+        system("notify-send \"Pesan Error: \" \"File yang anda buka adalah file hasil salinan. File tidak bisa diubah maupun disalin kembali!\" ");   
+    }
     (void) fi;
     fd = open(fpath, O_RDONLY);
     if (fd == -1)
