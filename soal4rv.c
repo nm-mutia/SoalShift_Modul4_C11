@@ -25,7 +25,7 @@
 #include <string.h>
 #endif
 
-static const char *dirpath = "/home/dayday/Downloads/simpanan";
+static const char *dirpath = "/home/dayday/Downloads";
 //static const char *dirpath2 = "/home/dayday/Downloads/simpanan";
 
 char alamat[100],alamat2[100];
@@ -35,104 +35,106 @@ int buka=0;
 //Mendapatkan file attribut
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
-    buka=1;
-    char fpath[1000];
-    sprintf(fpath,"%s%s",dirpath,path);
-    int res;
-    //strcpy(alamat2,path);
-    res = lstat(fpath, stbuf);
-    if (res == -1)
-        return -errno;
-    return 0;
+  	int res;
+	char fpath[1000];
+	
+	sprintf(fpath,"%s%s",dirpath,path);
+	res = lstat(fpath, stbuf);
+
+	if (res == -1)
+		return -errno;
+
+	return 0;
 }
 
-//Membuka directory
-static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,off_t offset, struct fuse_file_info *fi)
+static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+		       off_t offset, struct fuse_file_info *fi)
 {
-    buka=0;
-    char fpath[1000];
-    DIR *dp;
-    struct dirent *de;
+  	char fpath[1000];
+	if(strcmp(path,"/") == 0)
+	{
+		path=dirpath;
+		sprintf(fpath,"%s",path);
+	}
+	else sprintf(fpath, "%s%s",dirpath,path);
+	int res = 0;
 
-    if(strcmp(path,"/") == 0){
-    	path=dirpath;
-    	sprintf(fpath,"%s",path);
-    	}
-    else sprintf(fpath, "%s%s",dirpath,path);
-    //int res = 0;
+	DIR *dp;
+	struct dirent *de;
 
-    (void) offset;
-    (void) fi;
-    dp = opendir(fpath);
-    if (dp == NULL)
-        return -errno;
-    while ((de = readdir(dp)) != NULL)
-    {
-        struct stat st;
-        memset(&st, 0, sizeof(st));
-        st.st_ino = de->d_ino;
-        st.st_mode = de->d_type << 12;
-        if (filler(buf, de->d_name, &st, 0))
-            break;
-    }
-    closedir(dp);
-    return 0;
+	(void) offset;
+	(void) fi;
+
+	dp = opendir(fpath);
+	if (dp == NULL)
+		return -errno;
+
+	while ((de = readdir(dp)) != NULL) {
+		struct stat st;
+		memset(&st, 0, sizeof(st));
+		st.st_ino = de->d_ino;
+		st.st_mode = de->d_type << 12;
+		res = (filler(buf, de->d_name, &st, 0));
+			if(res!=0) break;
+	}
+
+	closedir(dp);
+	return 0;
 }
-
 
 //Membuat symbolic link
-static int xmp_rename(const char *from, const char *to)
-{
-    buka=0;  
-    int res;
-    char newdir[1000];
-    char nfrom[1000];
-    char nto[1000];
-    char arg[1000];
+// static int xmp_rename(const char *from, const char *to)
+// {
+//     buka=0;  
+//     int res;
+//     char newdir[1000];
+//     char nfrom[1000];
+//     char nto[1000];
+//     char arg[1000];
   
-    sprintf(newdir, "/home/dayday/Downloads/simpanan");
+//     sprintf(newdir, "/home/dayday/Downloads/simpanan");
 
-    sprintf(arg,"mkdir -p %s",newdir);
-    system (arg);
+//     sprintf(arg,"mkdir -p %s",newdir);
+//     system (arg);
 
-    sprintf(nfrom,"%s%s",dirpath,from);
-    sprintf(nto,"%s%s",newdir,to);
-    res = rename(nfrom, nto);
-    if(res == -1)
-    return -errno;
-    return 0;
-}
+//     sprintf(nfrom,"%s%s",dirpath,from);
+//     sprintf(nto,"%s%s",newdir,to);
+//     res = rename(nfrom, nto);
+//     if(res == -1)
+//     return -errno;
+//     return 0;
+// }
 
 //Mengubah mod
-static int xmp_chmod(const char *path, mode_t mode)
-{
-    buka=0;
-    int res;
-    char fpath[1000];
-    sprintf(fpath,"%s%s",dirpath,path);
-    res = chmod(fpath, mode);
-    if (res == -1)
-        return -errno;
-    return 0;
-}
+// static int xmp_chmod(const char *path, mode_t mode)
+// {
+//     buka=0;
+//     int res;
+//     char fpath[1000];
+//     sprintf(fpath,"%s%s",dirpath,path);
+//     res = chmod(fpath, mode);
+//     if (res == -1)
+//         return -errno;
+//     return 0;
+// }
 
 //Membuat node file
-static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
-{
-    buka=0;
-    int res;
-    char fpath[1000];
-    sprintf(fpath,"%s%s",dirpath,path);
-    res=mknod(fpath,mode,rdev);
-    if (res==-1)
-        return -errno;
-    return 0;
-}
-const char *ext(const char *filename) {
-    const char *dot = strrchr(filename, '.');
-    if(!dot || dot == filename) return "";
-    return dot + 1;
-}
+// static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
+// {
+//     buka=0;
+//     int res;
+//     char fpath[1000];
+//     sprintf(fpath,"%s%s",dirpath,path);
+//     res=mknod(fpath,mode,rdev);
+//     if (res==-1)
+//         return -errno;
+//     return 0;
+// }
+// const char *ext(const char *filename) {
+//     const char *dot = strrchr(filename, '.');
+//     if(!dot || dot == filename) return "";
+//     return dot + 1;
+// }
 //Membaca data dari file yang telah dibuka
 static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struct fuse_file_info *fi)
 {
@@ -144,15 +146,17 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,struc
     	path=dirpath;
     	sprintf(fpath,"%s",path);
     	}
-    else sprintf(fpath, "%s%s",dirpath,path);
+    else sprintf(fpath, "%s/simpanan/%s",dirpath,path);
     int res = 0;
     
     char read[1000], dirmake[1000];
-	sprintf(read, "%s.ditandai", fpath);
+    sprintf(read, "%s.ditandai", fpath);
     rename(fpath, read);
     
-    if(strcmp(ext(path),"copy")==0){
-        system("notify-send \"Pesan Error: \" \"File yang anda buka adalah file hasil salinan. File tidak bisa diubah maupun disalin kembali!\" ");   
+    if(strcmp(ext(read),"copy")==0){
+        system("zenity --error --text='File yang anda buka adalah file hasil salinan. File tidak bisa diubah maupun disalin kembali!\'");   
+    	system("chmod 000 /home/dayday/Downloads/simpanan/*.copy");
+	return -errno;
     }
     (void) fi;
     fd = open(fpath, O_RDONLY);
